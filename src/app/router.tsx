@@ -5,6 +5,7 @@ import { SignupPage } from "@/features/auth/pages/SignupPage";
 import { WelcomePage } from "@/features/auth/pages/WelcomePage";
 import { HomePage } from "@/features/home/pages/HomePage";
 import { ProfilePage } from "@/features/profile/pages/ProfilePage";
+import { AppLayout } from "./AppLayout";
 import { ProtectedRoute, PublicOnlyRoute } from "./guards";
 import { NotFoundPage } from "./NotFoundPage";
 import { paths } from "./paths";
@@ -20,13 +21,18 @@ export const router = createBrowserRouter([
       { path: paths.forgotPassword, element: <ForgotPasswordPage /> },
     ],
   },
-  // Only for logged-in users. Add new feature routes here.
-  // Admin-only routes: add another group with <ProtectedRoute roles={["admin"]} />.
+  // Only for logged-in users, inside the navbar layout. Add new feature routes to the inner children.
+  // Admin-only pages: add another group with <ProtectedRoute roles={["admin"]} />.
   {
     element: <ProtectedRoute />,
     children: [
-      { path: paths.home, element: <HomePage /> },
-      { path: paths.profile, element: <ProfilePage /> },
+      {
+        element: <AppLayout />,
+        children: [
+          { path: paths.home, element: <HomePage /> },
+          { path: paths.profile, element: <ProfilePage /> },
+        ],
+      },
     ],
   },
   { path: "*", element: <NotFoundPage /> },
