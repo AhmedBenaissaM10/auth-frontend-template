@@ -22,10 +22,15 @@ export function useSession() {
     queryKey: sessionKey,
     queryFn: async (): Promise<User | null> => {
       try {
-        return (await authApi.getProfile()).user;
+        const data = await authApi.getProfile();
+        if (!data?.user) {
+          throw new Error("GET /auth/profile returned no `data.user`. Compare the response with docs/openapi.yaml.");
+        }
+        return data.user;
       } catch (error) {
         // 401 after the silent refresh attempt means "not logged in", not a failure.
         if (isApiError(error) && error.isUnauthorized) return null;
+        if (import.meta.env.DEV) console.error("[session] profile check failed:", error);
         throw error;
       }
     },
@@ -39,7 +44,7 @@ export function useSession() {
   else status = "loading";
 
   const user = query.data ?? null;
-  return { user, status, isAdmin: user?.role === "admin", refetch: query.refetch };
+  return { user, status, error: query.error, isAdmin: user?.role === "admin", refetch: query.refetch };
 }
 
 export function useLogin() {

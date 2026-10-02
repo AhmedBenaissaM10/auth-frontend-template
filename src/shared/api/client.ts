@@ -47,6 +47,7 @@ async function send(path: string, options: RequestOptions): Promise<Response> {
     return await fetch(buildUrl(path, options.query), {
       method: options.method ?? "GET",
       credentials: "include", // required: auth lives in httpOnly cookies
+      cache: "no-store", // never serve or revalidate cached API responses (avoids 304s on authenticated GETs)
       headers: {
         Accept: "application/json",
         ...(hasBody ? { "Content-Type": "application/json" } : {}),
